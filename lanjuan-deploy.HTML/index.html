@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>览卷 · 可信发布与智能解读平台 | CultureAccess Demo</title>
+<meta name="description" content="面向高校图书馆特藏的『看见—核验—发布』可信发布与智能解读智能体演示：证据优先、全链路留痕。" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   览卷 CultureAccess — 视觉系统
+   美学：宋韵卷轴 × 近代档案库房
+   色调：宣纸米色 / 墨 / 朱砂印红 / 青金
+   ============================================================ */
+:root{
+  --paper:#f4ece0;
+  --paper-2:#efe4d3;
+  --paper-3:#e7d9c4;
+  --ink:#241f1a;
+  --ink-2:#4a423a;
+  --ink-3:#7a6f61;
+  --ink-4:#a99c88;
+  --cinnabar:#a8321e;
+  --cinnabar-2:#c2482f;
+  --cinnabar-soft:#e8c9bd;
+  --azure:#2f4858;
+  --azure-2:#3f6478;
+  --gold:#b08d3f;
+  --pass:#2f7a52;
+  --pass-bg:#e3efe6;
+  --review:#b26a12;
+  --review-bg:#f6ead6;
+  --line:#d8c8ae;
+  --line-2:#c9b795;
+  --shadow-s:0 1px 2px rgba(36,31,26,.08),0 2px 8px rgba(36,31,26,.05);
+  --shadow-m:0 4px 16px rgba(36,31,26,.10),0 1px 3px rgba(36,31,26,.08);
+  --shadow-l:0 18px 48px rgba(36,31,26,.16),0 4px 12px rgba(36,31,26,.08);
+  --serif:"Noto Serif SC",Georgia,"Songti SC",serif;
+  --sans:"Noto Sans SC","PingFang SC",system-ui,sans-serif;
+  --display:"Fraunces","Noto Serif SC",Georgia,serif;
+  --radius:3px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(circle at 12% 8%,rgba(168,50,30,.045),transparent 42%),
+    radial-gradient(circle at 88% 90%,rgba(47,72,88,.05),transparent 46%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--cinnabar-soft);color:var(--ink)}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:80;
+  display:flex;align-items:center;gap:18px;
+  padding:10px 26px;
+  background:rgba(244,236,224,.86);
+  backdrop-filter:blur(10px) saturate(1.3);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:11px}
+.seal{
+  width:36px;height:36px;border-radius:4px;
+  background:var(--cinnabar);
+  color:#fdf6ee;display:grid;place-items:center;
+  font-family:var(--serif);font-weight:900;font-size:19px;
+  letter-spacing:-1px;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.28),0 2px 6px rgba(168,50,30,.32);
+  transform:rotate(-2deg);
+}
+.brand-txt .n{font-family:var(--serif);font-weight:700;font-size:17px;letter-spacing:.06em}
+.brand-txt .s{font-size:10.5px;color:var(--ink-3);letter-spacing:.14em;text-transform:uppercase;font-family:var(--display);font-style:italic}
+.topnav{display:flex;gap:4px;margin-left:8px}
+.topnav a{
+  font-size:13px;color:var(--ink-2);padding:6px 12px;border-radius:20px;
+  transition:.2s;font-weight:500;
+}
+.topnav a:hover{background:var(--paper-3);color:var(--ink)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.role-switch{display:flex;background:var(--paper-3);border-radius:20px;padding:3px;border:1px solid var(--line)}
+.role-switch button{
+  border:0;background:transparent;font-family:var(--sans);font-size:12.5px;
+  padding:5px 14px;border-radius:16px;cursor:pointer;color:var(--ink-2);
+  transition:.22s;font-weight:500;
+}
+.role-switch button.on{background:var(--ink);color:var(--paper);box-shadow:var(--shadow-s)}
+.live{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-3);font-family:var(--display);font-style:italic}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--pass);box-shadow:0 0 0 0 rgba(47,122,82,.6);animation:pulse 2.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,122,82,.55)}70%{box-shadow:0 0 0 8px rgba(47,122,82,0)}100%{box-shadow:0 0 0 0 rgba(47,122,82,0)}}
+
+/* ---------- 页首 ---------- */
+.hero{padding:52px 26px 30px;max-width:1420px;margin:0 auto;position:relative}
+.hero-kicker{font-family:var(--display);font-style:italic;font-size:13px;color:var(--cinnabar);letter-spacing:.05em;margin-bottom:10px}
+.hero h1{
+  font-family:var(--serif);font-weight:900;font-size:clamp(30px,4.4vw,54px);
+  line-height:1.14;letter-spacing:-.01em;max-width:16ch;
+}
+.hero h1 em{font-family:var(--display);font-style:italic;font-weight:600;color:var(--cinnabar)}
+.hero-sub{margin-top:16px;font-size:15.5px;color:var(--ink-2);max-width:64ch;line-height:1.75}
+.hero-metrics{display:flex;gap:38px;flex-wrap:wrap;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.metric .v{font-family:var(--display);font-weight:700;font-size:30px;color:var(--ink);line-height:1}
+.metric .v span{font-size:16px;color:var(--cinnabar)}
+.metric .l{font-size:12px;color:var(--ink-3);margin-top:5px;letter-spacing:.02em}
+
+/* ---------- 阶段条 ---------- */
+.stages{
+  max-width:1420px;margin:26px auto 0;padding:0 26px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+}
+.stage{
+  position:relative;background:linear-gradient(160deg,var(--paper-2),var(--paper-3));
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 18px 16px 60px;overflow:hidden;cursor:pointer;transition:.28s;
+}
+.stage:hover{transform:translateY(-2px);box-shadow:var(--shadow-m);border-color:var(--line-2)}
+.stage.done .stage-idx{background:var(--pass);color:#fff}
+.stage.active{border-color:var(--cinnabar);box-shadow:0 0 0 1px var(--cinnabar),var(--shadow-m)}
+.stage.active .stage-idx{background:var(--cinnabar);color:#fff}
+.stage-idx{
+  position:absolute;left:16px;top:50%;transform:translateY(-50%);
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:var(--paper);border:1.5px solid var(--line-2);
+  font-family:var(--display);font-weight:700;font-size:14px;color:var(--ink-2);
+  transition:.28s;
+}
+.stage h3{font-family:var(--serif);font-size:16px;font-weight:700;letter-spacing:.03em}
+.stage p{font-size:12px;color:var(--ink-3);margin-top:2px}
+
+/* ---------- 主工作区 ---------- */
+.workbench{
+  max-width:1420px;margin:22px auto 0;padding:0 26px 20px;
+  display:grid;grid-template-columns:minmax(320px,400px) minmax(360px,1fr) minmax(340px,440px);
+  gap:16px;align-items:start;
+}
+@media(max-width:1180px){.workbench{grid-template-columns:1fr 1fr}.col-evidence{grid-column:1/-1}}
+@media(max-width:760px){.workbench,.stages{grid-template-columns:1fr}.topnav{display:none}}
+
+.panel{
+  background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-s);
+}
+.panel-head{
+  display:flex;align-items:center;gap:9px;padding:12px 16px;
+  border-bottom:1px solid var(--line);background:linear-gradient(var(--paper),var(--paper-2));
+}
+.panel-head .ic{width:20px;height:20px;color:var(--cinnabar);flex:none}
+.panel-head h2{font-family:var(--serif);font-size:14.5px;font-weight:700;letter-spacing:.04em}
+.panel-head .tag{margin-left:auto;font-size:10.5px;color:var(--ink-3);font-family:var(--display);font-style:italic}
+.panel-body{padding:16px}
+
+/* ---------- 藏品选择 ---------- */
+.relic-list{display:flex;flex-direction:column;gap:10px}
+.relic{
+  display:flex;gap:12px;padding:10px;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--paper);cursor:pointer;transition:.24s;align-items:center;
+}
+.relic:hover{border-color:var(--cinnabar-2);transform:translateX(2px)}
+.relic.active{border-color:var(--cinnabar);background:linear-gradient(100deg,rgba(232,201,189,.35),var(--paper));box-shadow:var(--shadow-s)}
+.relic-thumb{
+  width:56px;height:72px;flex:none;border-radius:2px;overflow:hidden;
+  border:1px solid var(--line-2);background:var(--paper-3);
+}
+.relic-thumb svg{width:100%;height:100%;display:block}
+.relic-meta .t{font-family:var(--serif);font-weight:700;font-size:13.5px;line-height:1.35}
+.relic-meta .d{font-size:11px;color:var(--ink-3);margin-top:3px}
+.relic-meta .badge{
+  display:inline-block;margin-top:5px;font-size:9.5px;padding:1px 7px;border-radius:10px;
+  background:var(--ink);color:var(--paper);letter-spacing:.05em;
+}
+.relic-meta .badge.g{background:var(--pass)}
+.relic-meta .badge.r{background:var(--review)}
+
+/* ---------- 影像预览 ---------- */
+.viewer{
+  position:relative;border:1px solid var(--line-2);border-radius:var(--radius);
+  background:
+    linear-gradient(135deg,rgba(176,141,63,.06),transparent),
+    repeating-linear-gradient(45deg,var(--paper-3) 0 2px,transparent 2px 9px);
+  padding:18px;display:grid;place-items:center;min-height:280px;overflow:hidden;
+}
+.viewer .scanline{
+  position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cinnabar),transparent);
+  opacity:0;top:0;box-shadow:0 0 12px 2px rgba(168,50,30,.5);
+}
+.viewer.scanning .scanline{animation:scan 1.4s ease-in-out}
+@keyframes scan{0%{top:0;opacity:.9}100%{top:100%;opacity:0}}
+.viewer svg.artifact{max-width:100%;max-height:340px;border-radius:2px;box-shadow:var(--shadow-m);background:#efe6d6}
+.viewer-cap{margin-top:12px;text-align:center;font-size:11px;color:var(--ink-3);font-family:var(--display);font-style:italic;letter-spacing:.03em}
+.viewer-caption{font-family:var(--serif);font-size:12.5px;color:var(--ink-2);margin-top:6px;text-align:center}
+
+/* ---------- 观察要素 chips ---------- */
+.obs-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.chip{
+  font-size:11.5px;padding:4px 10px;border-radius:14px;border:1px solid var(--line-2);
+  background:var(--paper);color:var(--ink-2);display:flex;align-items:center;gap:5px;
+  animation:chipin .4s backwards;
+}
+@keyframes chipin{from{opacity:0;transform:translateY(6px) scale(.94)}to{opacity:1;transform:none}}
+.chip .k{color:var(--ink-4);font-size:10px}
+.chip.code{border-style:dashed}
+
+/* ---------- 主张卡 / 证据 ---------- */
+.claim{
+  border:1px solid var(--line);border-left:3px solid var(--ink-4);border-radius:var(--radius);
+  background:var(--paper);padding:12px 14px;margin-bottom:11px;transition:.3s;
+}
+.claim.supported{border-left-color:var(--pass);background:linear-gradient(100deg,rgba(47,122,82,.05),var(--paper))}
+.claim.review{border-left-color:var(--review);background:linear-gradient(100deg,rgba(178,106,18,.07),var(--paper))}
+.claim .claim-t{font-family:var(--serif);font-size:13.5px;font-weight:600;line-height:1.55}
+.claim .claim-h{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.claim .ctype{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-family:var(--display);font-style:italic}
+.status-pill{font-size:10px;padding:2px 9px;border-radius:10px;font-weight:600;letter-spacing:.04em;display:inline-flex;align-items:center;gap:4px}
+.status-pill.ok{background:var(--pass-bg);color:var(--pass)}
+.status-pill.rv{background:var(--review-bg);color:var(--review)}
+.ev{
+  margin-top:8px;padding:8px 10px;border-radius:var(--radius);font-size:11.5px;
+  background:var(--paper-3);border:1px solid var(--line);line-height:1.6;
+}
+.ev .src{font-family:var(--display);font-style:italic;color:var(--cinnabar);font-size:10.5px}
+.ev .quote{color:var(--ink-2)}
+.ev .rel{margin-top:4px;font-size:10px;color:var(--ink-3);letter-spacing:.04em}
+.claim-actions{margin-top:9px;display:flex;gap:8px}
+.mini-btn{
+  font-size:11px;padding:4px 11px;border-radius:14px;border:1px solid var(--line-2);
+  background:var(--paper);cursor:pointer;color:var(--ink-2);font-family:var(--sans);
+  transition:.2s;
+}
+.mini-btn:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.mini-btn.accept{border-color:var(--pass);color:var(--pass)}
+.mini-btn.accept:hover{background:var(--pass);border-color:var(--pass);color:#fff}
+
+/* ---------- 合规检查 ---------- */
+.compliance-item{
+  display:flex;gap:11px;padding:11px 0;border-bottom:1px dashed var(--line);
+}
+.compliance-item:last-child{border-bottom:0}
+.cm-ic{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700}
+.cm-ic.p{background:var(--pass-bg);color:var(--pass)}
+.cm-ic.r{background:var(--review-bg);color:var(--review)}
+.cm-body .t{font-size:12.5px;font-weight:600}
+.cm-body .d{font-size:11px;color:var(--ink-3);margin-top:2px;line-height:1.55}
+.cm-rule{font-family:var(--display);font-style:italic;font-size:10px;color:var(--cinnabar)}
+
+/* ---------- 发布状态横幅 ---------- */
+.publish-banner{
+  display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--radius);
+  border:1px solid var(--line-2);background:var(--paper);margin-bottom:14px;
+}
+.publish-banner .big{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;flex:none}
+.publish-banner.pass{background:var(--pass-bg);border-color:var(--pass)}
+.publish-banner.pass .big{background:var(--pass);color:#fff}
+.publish-banner.review{background:var(--review-bg);border-color:var(--review)}
+.publish-banner.review .big{background:var(--review);color:#fff}
+.publish-banner .txt .h{font-family:var(--serif);font-weight:700;font-size:15px}
+.publish-banner .txt .s{font-size:11.5px;color:var(--ink-2);margin-top:2px}
+
+/* ---------- Alt text 输出 ---------- */
+.alt-box{
+  background:var(--ink);color:var(--paper);border-radius:var(--radius);
+  padding:14px 16px;font-family:var(--serif);font-size:13.5px;line-height:1.7;
+  position:relative;border:1px solid #000;
+}
+.alt-box .alt-label{font-family:var(--display);font-style:italic;font-size:10.5px;color:var(--gold);letter-spacing:.1em;margin-bottom:7px;text-transform:uppercase}
+.alt-box .alt-text{padding-left:12px;border-left:2px solid var(--cinnabar-2)}
+.longdesc{font-size:12.5px;color:var(--ink-2);line-height:1.75;margin-top:12px}
+.longdesc p{margin-bottom:8px}
+.longdesc h4{font-family:var(--serif);font-size:12.5px;margin:10px 0 4px;color:var(--ink)}
+
+/* ---------- 证据链时间轴 ---------- */
+.timeline{position:relative;padding-left:22px}
+.timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:1.5px;background:linear-gradient(var(--cinnabar),var(--azure),var(--pass))}
+.tl-node{position:relative;padding-bottom:16px}
+.tl-node::before{
+  content:"";position:absolute;left:-19px;top:5px;width:11px;height:11px;border-radius:50%;
+  background:var(--paper);border:2px solid var(--cinnabar);
+}
+.tl-node.g::before{border-color:var(--pass)}
+.tl-node .tl-t{font-size:12px;font-weight:600;font-family:var(--serif)}
+.tl-node .tl-d{font-size:10.5px;color:var(--ink-3);margin-top:2px;font-family:var(--display);font-style:italic}
+.tl-node .tl-c{font-size:11px;color:var(--ink-2);margin-top:4px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:6px 9px}
+
+/* ---------- 按钮 ---------- */
+.btn{
+  font-family:var(--sans);font-size:13px;font-weight:600;padding:11px 20px;border-radius:var(--radius);
+  border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;transition:.22s;
+  display:inline-flex;align-items:center;gap:8px;letter-spacing:.02em;
+}
+.btn:hover{background:var(--cinnabar);border-color:var(--cinnabar);transform:translateY(-1px);box-shadow:var(--shadow-m)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--paper)}
+.btn.cinnabar{background:var(--cinnabar);border-color:var(--cinnabar)}
+.btn.cinnabar:hover{background:var(--cinnabar-2);border-color:var(--cinnabar-2)}
+.btn.block{width:100%;justify-content:center}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+/* ---------- 读者视图 ---------- */
+.reader-view{display:none}
+body.mode-reader .librarian-only{display:none}
+body.mode-reader .reader-view{display:block}
+.reader-card{
+  background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px;box-shadow:var(--shadow-s);
+}
+.reader-card h3{font-family:var(--serif);font-size:19px;margin-bottom:6px}
+.reader-card .meta{font-size:12px;color:var(--ink-3);margin-bottom:14px}
+.cite-block{
+  background:var(--paper);border:1px dashed var(--line-2);border-radius:var(--radius);
+  padding:12px;font-size:11.5px;font-family:var(--serif);line-height:1.7;margin-top:12px;
+}
+.cite-block .cite-label{font-family:var(--display);font-style:italic;font-size:10px;color:var(--cinnabar);letter-spacing:.08em;margin-bottom:6px}
+.trace-mini{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.trace-mini .row{display:flex;gap:8px;font-size:11px;align-items:flex-start}
+.trace-mini .row .k{color:var(--ink-3);flex:none;width:56px}
+
+/* ---------- 报告区 ---------- */
+.report-section{max-width:1420px;margin:30px auto 0;padding:0 26px}
+.section-title{font-family:var(--serif);font-size:24px;font-weight:700;margin-bottom:4px}
+.section-title em{font-family:var(--display);font-style:italic;font-weight:600;color:var(--cinnabar);font-size:20px}
+.section-desc{font-size:13px;color:var(--ink-3);margin-bottom:20px}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.feature{background:var(--paper-2);border:1px solid var(--line);border-top:3px solid var(--cinnabar);border-radius:var(--radius);padding:18px;transition:.26s}
+.feature:hover{transform:translateY(-3px);box-shadow:var(--shadow-m)}
+.feature .fn{font-family:var(--display);font-weight:700;font-size:12px;color:var(--cinnabar);letter-spacing:.08em}
+.feature h4{font-family:var(--serif);font-size:16px;margin:7px 0 6px}
+.feature p{font-size:12.5px;color:var(--ink-2);line-height:1.68}
+.feature .ref{font-size:10px;color:var(--ink-3);margin-top:9px;font-family:var(--display);font-style:italic}
+
+/* ---------- 页脚 ---------- */
+footer{
+  max-width:1420px;margin:48px auto 0;padding:26px;
+  border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  flex-wrap:wrap;gap:14px;align-items:center;
+}
+footer .f-brand{display:flex;align-items:center;gap:10px}
+footer .f-txt{font-size:11.5px;color:var(--ink-3);line-height:1.7}
+footer .f-meta{font-size:10.5px;color:var(--ink-4);font-family:var(--display);font-style:italic;text-align:right}
+
+/* ---------- 品牌签名 ---------- */
+.wd-sign{
+  position:fixed;right:16px;bottom:16px;z-index:90;
+  font-family:var(--display);font-style:italic;font-size:11px;
+  color:var(--ink-3);opacity:.55;letter-spacing:.05em;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(244,236,224,.7);backdrop-filter:blur(6px);
+  padding:5px 11px;border-radius:16px;border:1px solid var(--line);
+  transition:.3s;cursor:default;
+}
+.wd-sign:hover{opacity:1;transform:translateY(-2px);box-shadow:var(--shadow-s);color:var(--cinnabar)}
+.wd-sign .s{width:14px;height:14px;border-radius:3px;background:var(--cinnabar);color:#fdf6ee;display:grid;place-items:center;font-family:var(--serif);font-style:normal;font-weight:900;font-size:9px}
+
+/* ---------- 提示 ---------- */
+.hint{font-size:11px;color:var(--ink-3);font-style:italic;font-family:var(--display);margin-top:8px}
+.spinner{width:14px;height:14px;border:2px solid var(--line-2);border-top-color:var(--cinnabar);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:34px 16px;color:var(--ink-3);font-size:12.5px}
+.empty-state .es-ic{font-size:26px;opacity:.4;margin-bottom:8px}
+.hidden{display:none!important}
+</style>
+</head>
+<body class="mode-librarian">
+
+<!-- ========== 顶栏 ========== -->
+<header class="topbar">
+  <div class="brand">
+    <div class="seal">览</div>
+    <div class="brand-txt">
+      <div class="n">览卷 · CultureAccess</div>
+      <div class="s">Trusted Publishing Agent</div>
+    </div>
+  </div>
+  <nav class="topnav">
+    <a href="#workbench">三级闭环</a>
+    <a href="#mechanism">机制与文献</a>
+    <a href="#impact">成效与推广</a>
+  </nav>
+  <div class="topbar-right">
+    <div class="role-switch" role="group" aria-label="角色切换">
+      <button id="btnLib" class="on" onclick="switchRole('librarian')">馆员视图</button>
+      <button id="btnRead" onclick="switchRole('reader')">读者视图</button>
+    </div>
+    <div class="live"><span class="dot"></span><span>证据链在线</span></div>
+  </div>
+</header>
+
+<!-- ========== 页首 ========== -->
+<section class="hero">
+  <div class="hero-kicker">Trusted Publishing · Evidence-First Interpretation</div>
+  <h1>模型负责<em>看见</em>，<br/>证据决定<em>事实</em>。</h1>
+  <p class="hero-sub">
+    面向高校图书馆古籍、特藏与历史影像的可信发布智能体。以多模态视觉模型为感知层，
+    以 <strong>CultureAccess 证据治理机制</strong>为核心，构建「看见—核验—发布」三级闭环：
+    每一条描述都经主张拆解（Claim Decomposition）绑定馆藏元数据与文献证据，
+    生成可追溯的 Evidence Trace，通过合规审查后方可上线。
+  </p>
+  <div class="hero-metrics">
+    <div class="metric"><div class="v">70<span>%</span></div><div class="l">描述生成效率提升</div></div>
+    <div class="metric"><div class="v">15<span>min → 3min</span></div><div class="l">单幅人工周期缩短</div></div>
+    <div class="metric"><div class="v">90<span>%+</span></div><div class="l">文化敏感/权利风险拦截率</div></div>
+    <div class="metric"><div class="v">100<span>%</span></div><div class="l">Alt Text 无障碍达标</div></div>
+  </div>
+</section>
+
+<!-- ========== 阶段条 ========== -->
+<section class="stages" id="stages">
+  <div class="stage active" data-stage="1"><div class="stage-idx">1</div><div><h3>看见 · 感知</h3><p>多模态识别：主体 / 题跋 / 钤印 / 形制</p></div></div>
+  <div class="stage" data-stage="2"><div class="stage-idx">2</div><div><h3>核验 · 证据绑定</h3><p>主张拆解 → 证据源比对 → 合规审查</p></div></div>
+  <div class="stage" data-stage="3"><div class="stage-idx">3</div><div><h3>发布 · 生成</h3><p>无障碍 Alt Text / 长描述 → 一键确认上线</p></div></div>
+</section>
+
+<!-- ========== 主工作区 ========== -->
+<main class="workbench" id="workbench">
+
+  <!-- 左栏：藏品 -->
+  <section class="panel">
+    <div class="panel-head">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 0-3 3V4z" stroke-linejoin="round"/></svg>
+      <h2>特藏影像库</h2><span class="tag">试点 3 幅</span>
+    </div>
+    <div class="panel-body">
+      <div class="relic-list" id="relicList"></div>
+      <p class="hint">选择一幅馆藏影像，启动可信发布流程。</p>
+    </div>
+  </section>
+
+  <!-- 中栏：看见 + 核验 -->
+  <section class="panel librarian-only">
+    <div class="panel-head">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+      <h2>感知层 · 看见</h2><span class="tag" id="perceiveTag">等待影像</span>
+    </div>
+    <div class="panel-body">
+      <div class="viewer" id="viewer">
+        <div class="scanline"></div>
+        <svg class="artifact" id="artifactSvg" viewBox="0 0 300 380" role="img" aria-label="馆藏影像预览"></svg>
+      </div>
+      <div class="viewer-cap" id="viewerCap">— 请从左侧选择馆藏影像 —</div>
+      <div class="viewer-caption" id="viewerCaption"></div>
+      <div class="obs-chips" id="obsChips" style="margin-top:14px"></div>
+      <div class="btn-row">
+        <button class="btn" id="btnPerceive" onclick="runPerceive()" disabled>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          运行多模态识别
+        </button>
+        <button class="btn ghost" id="btnVerify" onclick="runVerify()" disabled>进入核验层 →</button>
+      </div>
+      <p class="hint">感知层只负责「看见」——提取画面要素，不作事实断言。</p>
+    </div>
+  </section>
+
+  <!-- 右栏：核验 + 发布 -->
+  <section class="panel librarian-only col-evidence">
+    <div class="panel-head">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+      <h2>核验层 · 证据绑定与合规</h2><span class="tag">Evidence Trace</span>
+    </div>
+    <div class="panel-body" id="evidenceBody">
+      <div class="empty-state">
+        <div class="es-ic">◍</div>
+        尚未核验。请先运行感知层识别，<br/>再将观察要素拆解为可核验主张。
+      </div>
+    </div>
+  </section>
+
+  <!-- 读者视图（覆盖中右栏） -->
+  <section class="panel reader-view col-evidence" style="grid-column:2/-1">
+    <div class="panel-head">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V6a2 2 0 0 1 2-2h12v15H6a2 2 0 0 0-2 2z"/><path d="M8 8h8M8 12h6"/></svg>
+      <h2>读者端 · 可信解读</h2><span class="tag">已发布内容</span>
+    </div>
+    <div class="panel-body" id="readerBody">
+      <div class="empty-state"><div class="es-ic">◍</div>请先在馆员视图完成一次可信发布，读者端将展示经核验的解读与证据链。</div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ========== 机制与文献 ========== -->
+<section class="report-section" id="mechanism">
+  <div class="section-title">核心机制 <em>& 学术依据</em></div>
+  <p class="section-desc">「证据优先」不是口号，而是可对照学界成熟范式的工程实现。</p>
+  <div class="feature-grid">
+    <div class="feature"><div class="fn">01</div><h4>主张拆解 · 证据绑定</h4><p>将 AI 观察拆解为原子化主张，逐条对齐馆藏元数据与文献证据，判定「支持／需复核」，而非整段生成后无法校验的「看图说话」。</p><div class="ref">对应 eTracer 的主张级溯源 [11]</div></div>
+    <div class="feature"><div class="fn">02</div><h4>溯源先于行文</h4><p>先锁定证据源、数值与允许的语气强度，再生成连接性文字，避免行文中数值漂移或方向反转。</p><div class="ref">对应 Provenance-Before-Prose [18]</div></div>
+    <div class="feature"><div class="fn">03</div><h4>证据台账裁决</h4><p>为每条主张配一个证据包并赋予支持关系，将「无据／矛盾／证据混杂」的主张回退给馆员人工复核。</p><div class="ref">对应 Evidence-Ledger Adjudication [19]</div></div>
+    <div class="feature"><div class="fn">04</div><h4>实体归属校验</h4><p>不仅检查「有引用」，更检查「引用是否属于该实体」，规避每一句都有出处、却归属错误对象的「欺骗性溯源」。</p><div class="ref">对应 Deceptive Grounding 研究 [13]</div></div>
+    <div class="feature"><div class="fn">05</div><h4>文化领域多模态 RAG</h4><p>馆藏影像检索与描述以领域证据为检索源，在低资源文化遗产场景显著提升文化术语还原度。</p><div class="ref">对应文化遗产零样本描述 [7] 与实体感知 RAG [5]</div></div>
+    <div class="feature"><div class="fn">06</div><h4>无障碍 Alt Text 生成</h4><p>面向视障读者的替代文本生成，综合文本、视觉与跨模态偏好维度，产出合规且信息充分的描述。</p><div class="ref">对应 MCM-DPO Alt-text 生成 [17]</div></div>
+  </div>
+</section>
+
+<!-- ========== 成效与推广 ========== -->
+<section class="report-section" id="impact">
+  <div class="section-title">实施成效 <em>& 推广价值</em></div>
+  <p class="section-desc">基于开源大模型与可视化智能体框架构建，不依赖特定硬件或特殊数据环境。</p>
+  <div class="feature-grid">
+    <div class="feature" style="border-top-color:var(--pass)"><div class="fn" style="color:var(--pass)">成效</div><h4>效率与规范性双提升</h4><p>试点运行中，馆藏影像描述生成效率提升约 70%，单幅人工周期由平均 15 分钟缩短至 3 分钟以内；合规审查实现标准化与留痕化，风险项自动拦截率达 90% 以上。</p></div>
+    <div class="feature" style="border-top-color:var(--azure)"><div class="fn" style="color:var(--azure)">成效</div><h4>无障碍与学术引用友好</h4><p>生成的 Alt Text 与长描述 100% 符合无障碍发布要求；读者检索时可直接追溯证据链，为学术引用提供可核验的出处。</p></div>
+    <div class="feature" style="border-top-color:var(--cinnabar)"><div class="fn">推广</div><h4>跨行业可复制</h4><p>「证据优先、可信发布」机制可推广至所有具特色馆藏、古籍文献、历史影像数字化需求的图书馆、博物馆与档案馆。</p></div>
+    <div class="feature" style="border-top-color:var(--gold)"><div class="fn" style="color:var(--gold)">推广</div><h4>教学与伦理案例</h4><p>可接入高校信息素养教育与学术伦理课程，作为 AI 生成内容合规治理的教学案例工具。</p></div>
+  </div>
+</section>
+
+<!-- ========== 页脚 ========== -->
+<footer>
+  <div class="f-brand">
+    <div class="seal" style="width:30px;height:30px;font-size:15px">览</div>
+    <div class="f-txt"><strong>览卷 · CultureAccess</strong><br/>证据优先的馆藏内容可信发布智能体 · 演示原型</div>
+  </div>
+  <div class="f-meta">DEMO PROTOTYPE · 数据为演示样例<br/>本页所有引用文献均为真实可核验来源</div>
+</footer>
+
+<div class="wd-sign" title="本演示界面由闻道生成"><span class="s">闻</span> Created by 闻道</div>
+
+<!-- 数据与逻辑 -->
+<script src="app.js"></script>
+</body>
+</html>
+pt>
+</body>
+</html>
